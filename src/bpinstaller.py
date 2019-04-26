@@ -1,94 +1,52 @@
 import subprocess
 
 
-class BluePrismInstaller:
+class BluePrismCommands:
 
-    bp_installer_location = ""
+    _directory = "C:\\Program Files\\"
 
-    def __int__(self):
-        pass
+    _standard_bp_install_folder = "Blue Prism Limited\\Blue Prism Automate"
 
-    @classmethod
-    def set_bp_installer_location(cls, installer_location):
-        cls.bp_installer_location = installer_location
+    _automate_exe = "\\Automate.exe"
+    _automate_c_exe = "\\AutomateC.exe"
 
-    @classmethod
-    def install_blue_prism(cls):
-        pass
+    _automate = ""
+    _automate_c = ""
 
+    _arguments = [
+        (
+            "-CreateDBConnection",
+            ("--Server", "--Database", "--Connection", "--Username", "--Password"),
+            (True, True, False, False, False),
+            "{{AUTOMATE}} /setdbserver {{--Server}} /setdbname {{--Database}} /dbconname {{--Connection}} //setdbusername {{--Username}} /setdbpassword {{--Password}}"
+        ),
+        (
+            "-CreateBPConnection",
+            ("--Host", "--Port", "--Connection", "--Mode"),
+            (True, True, False, False),
+            "{{AUTOMATE}} /setbpserver {{-HOST}} {{--PORT}} /dbconname {{--Connection}} /connectionmode {{--Mode}}"
+        ),
+        (
+            "-LaunchBP",
+            (),
+            (),
+            "{{AUTOMATE}}"
+        ),
+        (
+            "-CreateDB",
+            ("--Connection"),
+            (False),
+            "{{AUTOMATE_C}} /createdb"
+        )
+    ]
 
-class BluePrismInterface:
+    def __init__(self, install_dir=""):
 
-    bp_install_dir = "C:\\Program Files\\Blue Prism Limited\\Blue Prism Automate"
+        id = self._directory + self._standard_bp_install_folder
 
-    def __init__(self):
-        pass
+        if install_dir != "":
+            id = install_dir
 
-    @classmethod
-    def create_db_server_connection(cls, database_server_name, database_name, username="", password="", connection_name=""):
-        a = [cls.automate(), "/setdbserver", database_server_name, "/setdbname", database_name]
+        self._automate = id + self._automate_exe
+        self._automate_c = id + self._automate_c_exe
 
-        if len(connection_name) > 0:
-            a += ["/dbconname", connection_name]
-
-        if len(username) > 0 or len(password) > 0:
-            if (len(username) > 0) != (len(password) > 0):
-                raise Exception("A username AND password must be supplied if an SQL database connection is to be used.")
-            a += ["/setdbusername", username, "/setdbpassword", password]
-
-        return a
-
-    @classmethod
-    def create_db(cls, password="", connection_name=""):
-        a = [cls.automate_c(), "/createdb", password]
-
-        if len(connection_name) > 0:
-            a += ["/dbconname", connection_name]
-
-        return a
-
-    @classmethod
-    def create_bp_server_connection(cls, host, port, connection_name="", connection_mode=""):
-        a = [cls.automate(), "/setbpserver", host, port]
-
-        if len(connection_name) > 0:
-            a += ["/dbconname", connection_name]
-
-        if len(connection_mode) > 0:
-            if connection_mode.isdigit() or (int(connection_mode) < 0 or int(connection_mode) > 5):
-                raise Exception("The Connection Mode must be between 0 and 5.")
-            elif not connection_mode.isdigit():
-                raise Exception("The Connection Mode supplied must be an integer.")
-
-            a += ["/connectionmode", connection_mode]
-
-        return a
-
-    @classmethod
-    def set_bp_install_dir(cls, install_dir):
-        cls.bp_install_dir = install_dir
-
-    @classmethod
-    def automate(cls):
-        a = cls.bp_install_dir + "\\Automate.exe"
-
-        return a
-
-    @classmethod
-    def automate_c(cls):
-        a = cls.bp_install_dir + "\\AutomateC.exe"
-
-        return a
-
-
-class CommandLineInterface:
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def run_command(cls, command):
-        subprocess.call(command)
-
-
-CommandLineInterface.run_command(BluePrismInterface.automate())
